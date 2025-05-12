@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/primary_dark">
+
+    <!-- 1) contenu statique : ce qu'on voit en permanence -->
+    <item
+        android:drawable="@color/primary_color" />
+
+    <!-- 2) masque du ripple (forme + couleur d'overlay au toucher) -->
+    <item android:id="@android:id/mask">
+        <shape>
+            <solid android:color="@color/primary_dark" />
+        </shape>
+    </item>
+</ripple>

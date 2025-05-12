@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Titre blanc centré -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Résultats du Quiz"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:layout_marginBottom="32dp"/>
+
+        <!-- Carte blanche arrondie avec ombre -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="24dp"
+            android:padding="24dp"
+            android:background="@color/form_bg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- "Ton Score" -->
+                <TextView
+                    android:id="@+id/scoreTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ton Score"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_color"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Valeur du score -->
+                <TextView
+                    android:id="@+id/score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3/5 bonnes réponses"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_color"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- "Détail des Réponses" -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Détail des Réponses"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_color"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Conteneur dynamique -->
+                <LinearLayout
+                    android:id="@+id/answersList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView>

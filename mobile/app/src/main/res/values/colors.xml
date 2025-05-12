@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_color">#4e54c8</color>
+    <color name="primary_dark">#2c2fa3</color>
+    <color name="accent_color">#ffd700</color>
+    <color name="light_bg">#f0f0f9</color>
+    <color name="form_bg">#ffffff</color>
+    <color name="text_color">#333333</color>
+    <color name="gradient_end">#8f94fb</color>
+    <color name="correct">#2ecc71</color>
+    <color name="incorrect">#e74c3c</color>
+    <color name="black">#000000</color>
+</resources>

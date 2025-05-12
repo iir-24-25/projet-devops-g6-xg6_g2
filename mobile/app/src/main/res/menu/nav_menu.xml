@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_home" android:title="Accueil" />
+    <item android:id="@+id/menu_create" android:title="Créer Manuellement" />
+    <item android:id="@+id/menu_multi" android:title="Jouer Multi" />
+    <item android:id="@+id/menu_auto" android:title="Générer Auto" />
+</menu>

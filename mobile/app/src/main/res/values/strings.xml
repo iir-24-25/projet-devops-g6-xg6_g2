@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Quiz App</string>
+    <string name="app_tagline">Créez ou générez vos quiz facilement</string>
+    <string name="menu_button_desc">Menu</string>
+    <string name="create_manual">Créer manuellement</string>
+    <string name="img_create_manual">Image pour création manuelle</string>
+    <string name="generate_auto">Générer automatiquement</string>
+    <string name="img_generate_auto">Image génération auto</string>
+    <string name="group_play">Jouer en groupe</string>
+    <string name="img_group_play">Image groupe</string>
+    <string name="start">Commencer</string>
+    <string name="desc_logo">Logo Quiz</string>
+
+    <string-array name="question_types">
+        <item>unique</item>
+        <item>multiple</item>
+    </string-array>
+
+    <string-array name="quiz_levels">
+        <item>Facile</item>
+        <item>Moyen</item>
+        <item>Difficile</item>
+    </string-array>
+</resources>
+
