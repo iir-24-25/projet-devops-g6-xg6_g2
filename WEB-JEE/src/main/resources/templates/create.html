@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer un Quiz - QuizMaster</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #3f51b5;
+      --secondary-color: #6a1b9a;
+      --hover-color: #2196f3;
+      --text-color: #333;
+      --light-background: #f9f9f9;
+      --input-border-color: #ccc;
+      --button-background: #6a1b9a;
+      --button-hover: #4a148c;
+      --btn-text-color: white;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, var(--primary-color), var(--secondary-color));
+      color: white;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.1);
+      padding: 1rem 2rem;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-links a {
+      color: white;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .quiz-builder {
+      background-color: white;
+      color: var(--text-color);
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    h2 { color: var(--primary-color); }
+
+    .question-container {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border: 1px solid var(--input-border-color);
+      border-radius: 8px;
+    }
+
+    .answers-container {
+      margin-top: 15px;
+    }
+
+    .answer-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: var(--button-background);
+      color: var(--btn-text-color);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: var(--button-hover);
+    }
+
+    .add-answer-btn {
+      background-color: #f44336;
+    }
+
+    .add-answer-btn:hover {
+      background-color: #d32f2f;
+    }
+
+    #room-info {
+      background-color: #f0f0ff;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 8px;
+      color: #333;
+    }
+
+    #room-id {
+      color: var(--secondary-color);
+      font-weight: bold;
+    }
+
+    #start-quiz-btn {
+      background-color: #28a745;
+    }
+
+    #start-quiz-btn:hover {
+      background-color: #1e7e34;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">🎓 QuizMaster</div>
+    <div class="nav-links">
+      <a href="/">Accueil</a>
+      <a href="/create">Créer Manuellement</a>
+      <a href="/auto">Générer Auto</a>
+      <a href="/play_quiz">Jouer Multi</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="quiz-builder">
+      <h2>Construisez votre quiz</h2>
+      <form id="quiz-form">
+        <div id="questions-container"></div>
+        <button type="button" id="add-question-btn">Ajouter une Question</button>
+        <button type="submit">Enregistrer le Quiz</button>
+      </form>
+      <div id="room-info" style="display: none;">
+        <p>Room ID : <span id="room-id"></span></p>
+        <button id="start-quiz-btn">Démarrer le Quiz</button>
+      </div>
+      <button onclick="showPlayers()">Afficher les joueurs</button>
+      <ul id="player-list"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2023 Générateur de Quiz Interactifs. Tous droits réservés.</p>
+  </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const addQuestionBtn = document.getElementById('add-question-btn');
+    const quizForm = document.getElementById('quiz-form');
+    const questionsContainer = document.getElementById('questions-container');
+    const roomInfoDiv = document.getElementById('room-info');
+    const roomIdSpan = document.getElementById('room-id');
+    const startQuizBtn = document.getElementById('start-quiz-btn');
+    let questionCounter = 0;
+
+    addQuestionBtn.addEventListener('click', () => {
+        questionCounter++;
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question-container');
+        questionDiv.innerHTML = `
+            <h3>Question ${questionCounter}</h3>
+            <div class="form-group">
+              <label for="question-${questionCounter}">Question :</label>
+              <input type="text" id="question-${questionCounter}" required>
+            </div>
+            <div class="form-group">
+              <label for="type-${questionCounter}">Type de question :</label>
+              <select id="type-${questionCounter}">
+                <option value="unique">Choix Unique</option>
+                <option value="multiple">Choix Multiple</option>
+                <option value="vf">Vrai / Faux</option>
+              </select>
+            </div>
+            <div class="form-group answers-container" id="answers-container-${questionCounter}">
+              <label>Réponses :</label>
+              <div class="answer-item">
+                <input type="radio" name="correct-answer-${questionCounter}" value="0">
+                <input type="text" name="answer-${questionCounter}-1" placeholder="Réponse 1" required>
+              </div>
+              <div class="answer-item">
+                <input type="radio" name="correct-answer-${questionCounter}" value="1">
+                <input type="text" name="answer-${questionCounter}-2" placeholder="Réponse 2" required>
+              </div>
+            </div>
+            <button type="button" class="add-answer-btn" data-question-id="${questionCounter}">Ajouter une Réponse</button>
+            <hr>
+        `;
+        questionsContainer.appendChild(questionDiv);
+
+        const typeSelect = questionDiv.querySelector(`#type-${questionCounter}`);
+        const updateInputTypes = () => {
+            const type = typeSelect.value;
+            const inputs = questionDiv.querySelectorAll(`input[name="correct-answer-${questionCounter}"]`);
+            inputs.forEach(input => {
+                input.type = (type === "multiple") ? "checkbox" : "radio";
+            });
+        };
+        typeSelect.addEventListener('change', updateInputTypes);
+        updateInputTypes();
+
+        questionDiv.querySelector('.add-answer-btn').addEventListener('click', (event) => {
+            const qId = event.target.dataset.questionId;
+            const container = document.getElementById(`answers-container-${qId}`);
+            const answerCount = container.querySelectorAll('.answer-item').length;
+            const inputType = document.getElementById(`type-${qId}`).value === 'multiple' ? 'checkbox' : 'radio';
+
+            const answerItem = document.createElement('div');
+            answerItem.classList.add('answer-item');
+            answerItem.innerHTML = `
+                <input type="${inputType}" name="correct-answer-${qId}" value="${answerCount}">
+                <input type="text" name="answer-${qId}-${answerCount + 1}" placeholder="Réponse ${answerCount + 1}" required>
+            `;
+            container.appendChild(answerItem);
+        });
+    });
+
+    quizForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const allQuestionsData = [];
+        const questionElements = document.querySelectorAll('.question-container');
+
+        for (let i = 0; i < questionElements.length; i++) {
+            const qEl = questionElements[i];
+            const question = qEl.querySelector(`input[type="text"]`).value;
+            const type = qEl.querySelector('select').value;
+            const answerInputs = Array.from(qEl.querySelectorAll('.answers-container input[type="text"]'));
+            const answers = answerInputs.map(inp => inp.value);
+
+            const correctInputs = Array.from(qEl.querySelectorAll('.answers-container input[name^="correct-answer-"]:checked'));
+            const correctIndices = correctInputs.map(inp => parseInt(inp.value));
+
+            if (!question || answers.length === 0 || correctIndices.length === 0) {
+                alert(`Veuillez remplir tous les champs pour la question ${i + 1}.`);
+                return;
+            }
+
+            allQuestionsData.push({
+                question,
+                type,
+                answers,
+                correctAnswers: correctIndices.map(i => answers[i])
+            });
+        }
+
+        try {
+            const res = await fetch('http://127.0.0.1:5000/create_manual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ questions: allQuestionsData })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                roomIdSpan.textContent = data.room_id;
+                roomInfoDiv.style.display = 'block';
+                alert(data.message);
+            } else {
+                alert(`Erreur : ${data.error || 'Erreur inconnue.'}`);
+            }
+        } catch (err) {
+            alert("Erreur réseau.");
+            console.error(err);
+        }
+    });
+
+    startQuizBtn.addEventListener('click', async () => {
+        const roomId = roomIdSpan.textContent;
+        console.log("Room ID:", roomId);
+
+        if (roomId) {
+            try {
+                // 1. Mettre à jour le statut du quiz à "started"
+                const statusRes = await fetch(`http://127.0.0.1:5000/quiz/${roomId}/status`, {
+                    method: 'PATCH',  // ou 'PUT' selon ton API
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'running' })  // Statut du quiz
+                });
+
+                const statusData = await statusRes.json();
+                if (!statusRes.ok) {
+                    alert(`Erreur de mise à jour du statut : ${statusData.error || 'Erreur inconnue.'}`);
+                    return;
+                }
+
+                // 2. Afficher un message de succès
+                alert("Le quiz a été démarré avec succès.");
+            } catch (err) {
+                alert("Erreur réseau lors de l'initialisation du quiz.");
+                console.error(err);
+            }
+        } else {
+            alert("L'ID de la room n'est pas encore disponible.");
+        }
+    });
+
+    
+});
+async function showPlayers() {
+        const roomId = document.getElementById("room-id").textContent;
+        const res = await fetch(`/api/room/${roomId}/players`);
+        const players = await res.json();
+
+        const ul = document.getElementById("player-list");
+        ul.innerHTML = "";
+        players.forEach(p => {
+            const li = document.createElement("li");
+            li.textContent = p;
+            ul.appendChild(li);
+        });
+    }
+</script>
+
+</body>
+</html>

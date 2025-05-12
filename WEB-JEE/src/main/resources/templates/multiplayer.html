@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jouer au Quiz - QuizMaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet" />
+    <style>
+        /* Styles pour la page */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #3f51b5, #6a1b9a);
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            background-color: rgba(0,0,0,0.1);
+            padding: 1rem;
+            width: 100%;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        h1, h2 {
+            color: white;
+        }
+
+        #join-group-container {
+            background-color: #fff;
+            color: #333;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        #room-id-input {
+            width: 100%;
+            padding: 0.6rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        #join-button {
+            margin-top: 1rem;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #6a1b9a;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #join-button:hover {
+            background-color: #4a148c;
+        }
+
+        .back-button {
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #6c757d;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/">Accueil</a>
+    <a href="/create">Créer Manuellement</a>
+    <a href="/auto">Générer Auto</a>
+    <a href="/multiplayer">Jouer Multi</a>
+</nav>
+
+<h1>Jouer au Quiz</h1>
+
+<div id="join-group-container">
+    <h2>Rejoindre une partie</h2>
+
+    <label for="pseudo-input">Entrez votre pseudo :</label>
+    <input type="text" id="pseudo-input" placeholder="Ex: Alex" required>
+
+    <label for="room-id-input">Entrez l'ID de la room :</label>
+    <input type="text" id="room-id-input" placeholder="Ex: 3b4e0194-..." required>
+
+    <button id="join-button" disabled>Rejoindre</button>
+</div>
+
+<a href="/" class="back-button">Retour à l'accueil</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const roomIdInput = document.getElementById('room-id-input');
+        const pseudoInput = document.getElementById('pseudo-input');
+        const joinButton = document.getElementById('join-button');
+
+        function updateJoinButton() {
+            joinButton.disabled = roomIdInput.value.trim() === '' || pseudoInput.value.trim() === '';
+        }
+
+        roomIdInput.addEventListener('input', updateJoinButton);
+        pseudoInput.addEventListener('input', updateJoinButton);
+
+        joinButton.addEventListener('click', async () => {
+    const roomId = roomIdInput.value.trim();
+    const pseudo = pseudoInput.value.trim();
+
+    if (roomId && pseudo) {
+        // Appel API pour enregistrer le joueur
+        try {
+            const response = await fetch(`/api/room/${roomId}/join?playerName=${pseudo}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                alert(`Erreur : ${err.message || "Impossible de rejoindre la room."}`);
+                return;
+            }
+
+            // Rediriger vers la page d'attente
+            window.location.href = `/wait?roomId=${encodeURIComponent(roomId)}&pseudo=${encodeURIComponent(pseudo)}`;
+        } catch (err) {
+            alert("Erreur de connexion au serveur.");
+            console.error(err);
+        }
+    }
+});
+
+    });
+
+</script>
+
+
+</body>
+</html>

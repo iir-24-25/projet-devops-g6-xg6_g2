@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats du Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #3f51b5, #6a1b9a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .score-summary {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .question-detail {
+            text-align: left;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .correct {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .answer {
+            color: #2980b9;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <h1>Résultats du Quiz</h1>
+
+    <div class="container">
+        <h2>Ton Score</h2>
+        <p class="score-summary"><strong>0 / 0</strong> bonne réponse</p>
+
+        <h3>Détail des Réponses</h3>
+        <div id="answers-container">
+            <!-- Les réponses dynamiques seront insérées ici -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Exemple de score et réponses venant d'un calcul dynamique
+    const score = 3;
+    const totalQuestions = 5;
+    const correctAnswers = [
+        { question: 'Quelle est la bonne syntaxe pour déclarer une classe en Java ?', answer: 'class MaClasse {}' },
+        { question: 'Quelle est la couleur du ciel ?', answer: 'Bleu' },
+        { question: 'Quel est le résultat de 2 + 2 ?', answer: '4' }
+    ];
+
+    // Mise à jour du score
+    document.querySelector('.score-summary').innerHTML = `<strong>${score} / ${totalQuestions}</strong> bonne réponse`;
+
+    // Ajout des réponses dynamiques
+    const answersContainer = document.querySelector('#answers-container');
+    correctAnswers.forEach(answer => {
+        const answerElement = document.createElement('div');
+        answerElement.classList.add('question-detail');
+        answerElement.innerHTML = `
+            <p><strong>${answer.question}</strong></p>
+            <p>Ta réponse : <span class="answer">${answer.answer}</span></p>
+            <p class="correct">✅ Bonne réponse !</p>
+        `;
+        answersContainer.appendChild(answerElement);
+    });
+</script>
+
+</body>
+</html>

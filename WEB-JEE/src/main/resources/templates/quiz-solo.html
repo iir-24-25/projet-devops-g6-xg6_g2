@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz en Groupe - QuizMaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #3f51b5, #6a1b9a);
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        nav {
+            background-color: rgba(0,0,0,0.1);
+            padding: 1rem;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: white;
+            margin-top: 40px;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 10px;
+            color: #cfd3ff;
+            text-decoration: none;
+        }
+
+        #quiz-container {
+            background-color: #fff;
+            color: #333;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .question h3 {
+            margin-top: 0;
+            color: #3f51b5;
+        }
+
+        .answers {
+            padding-left: 0;
+            margin-top: 15px;
+        }
+
+        .answer-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .answer-item input {
+            margin-right: 10px;
+        }
+
+        .answer-item label {
+            cursor: pointer;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .controls button {
+            margin: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #6a1b9a;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .controls button:hover:enabled {
+            background-color: #4a148c;
+        }
+
+        #submit-button {
+            background-color: #28a745;
+        }
+
+        #submit-button:hover {
+            background-color: #1e7e34;
+        }
+
+        #results-container {
+            background-color: #fff;
+            color: #333;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        #results-container h2 {
+            color: #28a745;
+            margin-top: 0;
+        }
+
+        #score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        #view-answers-button {
+            background-color: #6a1b9a;
+            color: white;
+            margin-top: 15px;
+        }
+
+        #view-answers-button:hover {
+            background-color: #4a148c;
+        }
+
+        #detailed-answers {
+            margin-top: 20px;
+            text-align: left;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .timer {
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/">Accueil</a>
+    <a href="/create">Créer Manuellement</a>
+    <a href="#">Générer Auto</a>
+    <a href="#">Jouer Multi</a>
+</nav>
+
+<h1>Quiz en Groupe</h1>
+
+<div id="quiz-container">
+    <div id="loading-message">Chargement du quiz...</div>
+    <div id="question-area" style="display: none;">
+        <div class="timer">Temps restant : <span id="time">30</span>s</div>
+        <h3 id="question-number">Question 1</h3>
+        <p id="question-text" class="question"></p>
+        <div id="answers-area" class="answers">
+        </div>
+    </div>
+    <div class="controls" id="navigation-controls" style="display: none;">
+        <button id="prev-button" disabled>Précédent</button>
+        <button id="next-button">Suivant</button>
+        <button id="submit-button" style="display: none;">Soumettre</button>
+    </div>
+</div>
+
+<div id="results-container">
+    <h2>Résultats du Quiz</h2>
+    <p>Votre score : <span id="score"></span></p>
+    <button id="view-answers-button">Voir les réponses</button>
+    <div id="detailed-answers" style="display: none;">
+    </div>
+</div>
+
+<a href="/" class="back-link">← Retour à l'accueil</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const quizContainer = document.getElementById('quiz-container');
+        const loadingMessage = document.getElementById('loading-message');
+        const questionArea = document.getElementById('question-area');
+        const questionNumberDisplay = document.getElementById('question-number');
+        const questionTextDisplay = document.getElementById('question-text');
+        const answersArea = document.getElementById('answers-area');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const submitButton = document.getElementById('submit-button');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreDisplay = document.getElementById('score');
+        const viewAnswersButton = document.getElementById('view-answers-button');
+        const detailedAnswersDiv = document.getElementById('detailed-answers');
+        const navigationControls = document.getElementById('navigation-controls');
+        const timerDisplay = document.getElementById('time');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('roomId');
+        let currentQuestionIndex = 0;
+        let questions = [];
+        const userAnswers = {};
+        let timer;
+        let timeLeft = 30;
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            timerDisplay.textContent = timeLeft;
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (currentQuestionIndex < questions.length - 1) {
+                        currentQuestionIndex++;
+                        displayQuestion();
+                    } else {
+                        submitQuiz();
+                    }
+                }
+            }, 1000);
+        }
+
+        async function loadQuestions(roomId) {
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/quiz/${roomId}/questions`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                questions = await response.json();
+                loadingMessage.style.display = 'none';
+                questionArea.style.display = 'block';
+                navigationControls.style.display = 'flex';
+                displayQuestion();
+            } catch (error) {
+                quizContainer.textContent = `Erreur lors du chargement du quiz: ${error}`;
+                console.error('Erreur chargement quiz:', error);
+            }
+        }
+
+        function displayQuestion() {
+            startTimer();
+            if (currentQuestionIndex < questions.length) {
+                const currentQuestion = questions[currentQuestionIndex];
+                questionNumberDisplay.textContent = `Question ${currentQuestionIndex + 1}`;
+                questionTextDisplay.textContent = currentQuestion.question;
+                answersArea.innerHTML = '';
+
+                currentQuestion.answers.forEach((answer, index) => {
+                    const answerDiv = document.createElement('div');
+                    answerDiv.classList.add('answer-item');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${currentQuestion.id}`;
+                    input.value = answer;
+                    input.id = `answer-${currentQuestion.id}-${index}`;
+                    input.addEventListener('change', () => {
+                        userAnswers[currentQuestion.id] = answer;
+                    });
+
+                    const label = document.createElement('label');
+                    label.textContent = answer;
+                    label.htmlFor = `answer-${currentQuestion.id}-${index}`;
+
+                    answerDiv.appendChild(input);
+                    answerDiv.appendChild(label);
+                    answersArea.appendChild(answerDiv);
+
+                    if (userAnswers[currentQuestion.id] === answer) {
+                        input.checked = true;
+                    }
+                });
+
+                prevButton.disabled = currentQuestionIndex === 0;
+                nextButton.style.display = currentQuestionIndex < questions.length - 1 ? 'inline-block' : 'none';
+                submitButton.style.display = currentQuestionIndex === questions.length - 1 ? 'inline-block' : 'none';
+            } else {
+                submitQuiz();
+            }
+        }
+
+        async function submitQuiz() {
+            clearInterval(timer);
+            try {
+                const responses = Object.keys(userAnswers).map(questionId => ({
+                    questionId: parseInt(questionId),
+                    answer: userAnswers[questionId]
+                }));
+
+                const response = await fetch(`http://127.0.0.1:5000/quiz/${roomId}/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ answers: responses }),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+                }
+
+                const results = await response.json();
+                questionArea.style.display = 'none';
+                navigationControls.style.display = 'none';
+                resultsContainer.style.display = 'block';
+                scoreDisplay.textContent = `${results.correctCount} / ${questions.length}`;
+
+                viewAnswersButton.addEventListener('click', () => {
+                    detailedAnswersDiv.innerHTML = '<h3>Vos Réponses:</h3>';
+                    results.results.forEach(result => {
+                        const p = document.createElement('p');
+                        p.textContent = `Question ID: ${result.questionId}, Votre réponse: ${result.answer}, Correct: ${result.isCorrect ? 'Oui' : 'Non'}, Réponse correcte: ${result.correctAnswer || 'Non spécifié'}`;
+                        detailedAnswersDiv.appendChild(p);
+                    });
+                    detailedAnswersDiv.style.display = 'block';
+                });
+
+            } catch (error) {
+                quizContainer.textContent = `Erreur lors de la soumission du quiz: ${error.message}`;
+                console.error('Erreur soumission quiz:', error);
+            }
+        }
+
+        submitButton.addEventListener('click', submitQuiz);
+
+        if (roomId) {
+            loadQuestions(roomId);
+        } else {
+            quizContainer.textContent = 'ID de la room invalide.';
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            displayQuestion();
+        });
+
+        prevButton.addEventListener('click', () => {
+            currentQuestionIndex--;
+            displayQuestion();
+        });
+    });
+</script>
+
+</body>
+</html>

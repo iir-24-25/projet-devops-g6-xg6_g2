@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jouer au Quiz - QuizMaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #3f51b5, #6a1b9a);
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            background-color: rgba(0,0,0,0.1);
+            padding: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        h1, h2 {
+            color: white;
+        }
+
+        .container {
+            background-color: #fff;
+            color: #333;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #6a1b9a;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #4a148c;
+        }
+
+        .back-button {
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #6c757d;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/">Accueil</a>
+    <a href="/create">Créer Manuellement</a>
+    <a href="/auto">Générer Auto</a>
+    <a href="/play_quiz">Jouer Multi</a>
+</nav>
+
+<h1>Jouer au Quiz</h1>
+
+<div class="container">
+    <h2>Rejoindre une partie</h2>
+    <label for="room-id-input">Entrez l'ID de la room :</label>
+    <input type="text" id="room-id-input" placeholder="Ex: 3b4e0194-..." required>
+    <button class="btn" id="join-button">Rejoindre</button>
+</div>
+
+<a href="/" class="back-button">Retour à l'accueil</a>
+
+<script>
+    document.getElementById('join-button').addEventListener('click', () => {
+        const roomId = document.getElementById('room-id-input').value.trim();
+        if (roomId !== "") {
+            window.location.href = `/multiplayer.html?roomId=${roomId}`;
+        } else {
+            alert("Veuillez entrer un ID de room.");
+        }
+    });
+</script>
+
+</body>
+</html>

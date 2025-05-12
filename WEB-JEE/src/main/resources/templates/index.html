@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizMaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #3f51b5, #6a1b9a);
+            color: white;
+            text-align: center;
+        }
+
+        nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.nav-links a {
+    color: white;
+    margin: 0 1rem;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+
+        h1 {
+            margin-top: 1rem;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: white;
+            color: black;
+            border-radius: 12px;
+            width: 250px;
+            padding: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card img {
+            max-width: 100%;
+            height: 100px;
+        }
+
+        .card button {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: #6a1b9a;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">🎓 QuizMaster</div>
+    <div class="nav-links">
+        <a href="/">Accueil</a>
+        <a href="/create">Créer Manuellement</a>
+        <a href="/auto">Générer Auto</a>
+        <a href="/multiplayer">Jouer Multi</a>
+    </div>
+</nav>
+
+
+<h1>QuizMaster</h1>
+<p>Créez, testez, et jouez à des quiz amusants et éducatifs !</p>
+
+<div class="container">
+    <div class="card">
+        <img src="/1.png" alt="Créer manuellement">
+        <h3>Créer Manuellement</h3>
+        <p>Créez vos propres questions personnalisées.</p>
+        <a href="/create"><button>Commencer</button></a>
+        
+    </div>
+    <div class="card">
+        <img src="/2.png" alt="Générer automatiquement">
+        <h3>Générer Automatiquement</h3>
+        <p>Laissez l'IA créer un quiz pour vous.</p>
+        <a href="/auto"><button>Générer</button></a>
+        
+    </div>
+    <div class="card">
+        <img src="/3.png" alt="Jouer en groupe">
+        <h3>Jouer en groupe</h3>
+        <p>Affrontez vos amis en temps réel !</p>
+        <a href="/multiplayer"><button>Défier</button></a>
+       
+    </div>
+</div>
+
+<footer>© 2025 QuizMaster. Tous droits réservés.</footer>
+
+</body>
+</html>

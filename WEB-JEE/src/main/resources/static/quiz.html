@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz en cours</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Répondez au Quiz</h1>
+    <div id="questionsContainer"></div>
+    <form id="quizForm">
+        <!-- Les questions seront ajoutées ici par JavaScript -->
+        <button type="submit">Soumettre</button>
+    </form>
+
+    <script>
+       document.addEventListener('DOMContentLoaded', async () => {
+    const roomId = new URLSearchParams(window.location.search).get('room_id');
+    const container = document.getElementById('questionsContainer');
+    let currentQuestionIndex = 0;  // Index de la question actuelle
+    let responses = [];  // Pour stocker les réponses
+    let questions = [];  // Pour stocker les questions récupérées
+
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/quiz/${roomId}/questions`);
+        const data = await response.json();
+        console.log(data);
+
+        if (response.ok && data.length > 0) {
+            questions = data;
+
+            // Fonction pour afficher une question à la fois
+            function showQuestion(index) {
+                if (index < questions.length) {
+                    const q = questions[index];
+                    console.log(`Question ${index + 1}: ${q.question}`);
+                    q.answers.forEach((answer, i) => {
+                        console.log(`  Choix ${i + 1}: ${answer.text}`);
+                    });
+
+                    // Création des éléments pour l'affichage sur la page
+                    container.innerHTML = '';  // Réinitialiser le conteneur avant chaque question
+                    const qBlock = document.createElement('div');
+                    qBlock.className = 'question-block';
+
+                    const qTitle = document.createElement('div');
+                    qTitle.className = 'question-title';
+                    qTitle.textContent = `Q${index + 1}. ${q.question}`;
+                    qBlock.appendChild(qTitle);
+
+                    q.answers.forEach((answer, i) => {
+                        const label = document.createElement('label');
+                        label.style.display = "block";
+
+                        const input = document.createElement('input');
+                        input.name = `question-${index}`;
+                        input.value = answer.id;  // Utilise l'ID de la réponse pour la soumettre
+                        input.type = q.correctAnswerIds.length > 1 ? "checkbox" : "radio";
+
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(" " + answer.text));
+                        qBlock.appendChild(label);
+                    });
+
+                    container.appendChild(qBlock);
+
+                    // Enregistrer les réponses lorsqu'elles sont soumises
+                    document.getElementById('quizForm').addEventListener('submit', async (e) => {
+                        e.preventDefault();
+
+                        const inputs = Array.from(document.querySelectorAll(`[name="question-${index}"]`));
+                        const selected = inputs.filter(input => input.checked).map(input => parseInt(input.value));
+
+                        responses.push({
+                            questionIndex: index,
+                            selectedAnswers: selected
+                        });
+
+                        // Passer à la question suivante après 20 secondes
+                        setTimeout(() => {
+                            currentQuestionIndex++;
+                            showQuestion(currentQuestionIndex);
+                        }, 20000);  // 20 secondes pour chaque question
+
+                    });
+                } else {
+                    // Fin du quiz, calculer le score
+                    let score = 0;
+                    responses.forEach((response) => {
+                        const question = questions[response.questionIndex];
+                        const correctAnswers = question.correctAnswerIds;
+                        const isCorrect = response.selectedAnswers.every(answerId => correctAnswers.includes(answerId));
+                        if (isCorrect) {
+                            score++;
+                        }
+                    });
+
+                    // Afficher le score
+                    container.innerHTML = `<h2>Quiz terminé !</h2><p>Votre score : ${score} / ${questions.length}</p>`;
+                }
+            }
+
+            // Afficher la première question
+            showQuestion(currentQuestionIndex);
+
+        } else {
+            container.innerHTML = "<p>Aucune question disponible.</p>";
+        }
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des questions :", error);
+        container.innerHTML = "<p>Erreur lors de la récupération des questions.</p>";
+    }
+});
+
+
+
+    </script>
+</body>
+</html>

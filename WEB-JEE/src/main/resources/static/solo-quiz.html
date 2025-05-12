@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz en Groupe - QuizMaster</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f9f9f9;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #0077cc;
+            margin-bottom: 20px;
+        }
+
+        #quiz-container {
+            background: white;
+            max-width: 800px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+        }
+
+        .question h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .answers {
+            padding-left: 20px;
+        }
+
+        .answer-item {
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .controls button:hover:enabled {
+            background-color: #005fa3;
+        }
+
+        #results-container {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            text-align: center;
+            display: none; /* Initialement caché */
+        }
+
+        #results-container h2 {
+            color: #28a745;
+        }
+
+        #score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quiz en solo</h1>
+
+    <div id="quiz-container">
+        <div id="loading-message">Chargement du quiz...</div>
+        <div id="question-area" style="display: none;">
+            <h3 id="question-number">Question 1</h3>
+            <p id="question-text"></p>
+            <div id="answers-area">
+            </div>
+        </div>
+        <div class="controls" id="navigation-controls" style="display: none;">
+            <button id="prev-button" disabled>Précédent</button>
+            <button id="next-button">Suivant</button>
+            <button id="submit-button" style="display: none;">Soumettre</button>
+        </div>
+    </div>
+
+    <div id="results-container">
+        <h2>Résultats du Quiz</h2>
+        <p>Votre score : <span id="score"></span></p>
+        <button id="view-answers-button">Voir les réponses</button>
+        <div id="detailed-answers" style="display: none;">
+        </div>
+    </div>
+
+    <a href="/" class="back-button">Retour à l'accueil</a>
+
+   <script>
+        document.addEventListener('DOMContentLoaded', () => { // Début de l'écouteur DOMContentLoaded
+
+            const quizContainer = document.getElementById('quiz-container');
+            const loadingMessage = document.getElementById('loading-message');
+            const questionArea = document.getElementById('question-area');
+            const questionNumberDisplay = document.getElementById('question-number');
+            const questionTextDisplay = document.getElementById('question-text');
+            const answersArea = document.getElementById('answers-area');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            const submitButton = document.getElementById('submit-button');
+            const resultsContainer = document.getElementById('results-container');
+            const scoreDisplay = document.getElementById('score');
+            const viewAnswersButton = document.getElementById('view-answers-button');
+            const detailedAnswersDiv = document.getElementById('detailed-answers');
+            const navigationControls = document.getElementById('navigation-controls');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('roomId');
+            let currentQuestionIndex = 0;
+            let questions = [];
+            const userAnswers = {};
+
+            console.log("Valeur de roomId récupérée :", roomId); // Important pour le débogage
+
+            async function loadQuestions(roomId) { // La fonction attend maintenant roomId comme argument
+                try {
+                    const response = await fetch(`http://127.0.0.1:5000/quiz/${roomId}/questions`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    questions = await response.json();
+                    loadingMessage.style.display = 'none';
+                    questionArea.style.display = 'block';
+                    navigationControls.style.display = 'flex';
+                    displayQuestion();
+                } catch (error) {
+                    quizContainer.textContent = `Erreur lors du chargement du quiz: ${error}`;
+                    console.error('Erreur chargement quiz:', error);
+                }
+            } // Fin de la fonction loadQuestions
+
+            function displayQuestion() { // Début de la fonction displayQuestion
+                if (currentQuestionIndex < questions.length) {
+                    const currentQuestion = questions[currentQuestionIndex];
+                    console.log("Question actuelle :", currentQuestion);
+                    questionNumberDisplay.textContent = `Question ${currentQuestionIndex + 1}`;
+                    questionTextDisplay.textContent = currentQuestion.question;
+                    answersArea.innerHTML = '';
+
+                    currentQuestion.answers.forEach((answer, index) => {
+                        console.log("Réponse :", answer, "Index :", index);
+                        const answerDiv = document.createElement('div');
+                        answerDiv.classList.add('answer-item');
+                        const input = document.createElement('input');
+                        input.type = 'radio';
+                        input.name = `question-${currentQuestion.id}`;
+                        input.value = answer;
+                        input.id = `answer-${currentQuestion.id}-${index}`;
+                        input.addEventListener('change', () => {
+                            userAnswers[currentQuestion.id] = answer;
+                            console.log("Réponse utilisateur pour la question", currentQuestion.id, ":", userAnswers[currentQuestion.id]);
+                        });
+
+                        const label = document.createElement('label');
+                        label.textContent = answer;
+                        label.htmlFor = `answer-${currentQuestion.id}-${index}`;
+
+                        answerDiv.appendChild(input);
+                        answerDiv.appendChild(label);
+                        answersArea.appendChild(answerDiv);
+
+                        if (userAnswers[currentQuestion.id] === answer) {
+                            input.checked = true;
+                        }
+                    });
+
+                    prevButton.disabled = currentQuestionIndex === 0;
+                    nextButton.style.display = currentQuestionIndex < questions.length - 1 ? 'inline-block' : 'none';
+                    submitButton.style.display = currentQuestionIndex === questions.length - 1 ? 'inline-block' : 'none';
+                } else {
+                    submitQuiz();
+                }
+            } // Fin de la fonction displayQuestion
+
+            async function submitQuiz() { // Début de la fonction submitQuiz
+                try {
+                    const responses = Object.keys(userAnswers).map(questionId => ({
+                        question_id: parseInt(questionId),
+                        answer: userAnswers[questionId]
+                    }));
+
+                    const response = await fetch(`http://127.0.0.1:5000/quiz/${roomId}/submit`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ responses: responses }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const results = await response.json();
+                    questionArea.style.display = 'none';
+                    navigationControls.style.display = 'none';
+                    resultsContainer.style.display = 'block';
+                    scoreDisplay.textContent = `${results.score} / ${questions.length}`;
+
+                    viewAnswersButton.addEventListener('click', () => {
+                        detailedAnswersDiv.innerHTML = '<h3>Vos Réponses:</h3>';
+                        results.results.forEach(result => {
+                            const p = document.createElement('p');
+                            p.textContent = `Question ID: ${result.question_id}, Votre réponse: ${result.user_answer}, Correct: ${result.correct_answer || 'Non spécifié'}`;
+                            detailedAnswersDiv.appendChild(p);
+                        });
+                        detailedAnswersDiv.style.display = 'block';
+                    });
+
+                } catch (error) {
+                    quizContainer.textContent = `Erreur lors de la soumission du quiz: ${error}`;
+                    console.error('Erreur soumission quiz:', error);
+                }
+            } // Fin de la fonction submitQuiz
+
+            submitButton.addEventListener('click', submitQuiz);
+
+            if (roomId) {
+                loadQuestions(roomId); // Appel de la fonction avec la valeur de roomId
+            } else {
+                quizContainer.textContent = 'ID de la room invalide.';
+            }
+
+            // Ajout de l'écouteur d'événements pour le bouton "Suivant"
+            nextButton.addEventListener('click', () => {
+                currentQuestionIndex++;
+                displayQuestion();
+            });
+
+        }); // Fin de l'écouteur DOMContentLoaded
+    </script>
+
+</body>
+</html>
